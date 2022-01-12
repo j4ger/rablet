@@ -1,4 +1,4 @@
-# tabletd
+# rablet
 A tablet driver written in Rust.
 
 ## Roadmap
@@ -7,6 +7,7 @@ A tablet driver written in Rust.
 
 - Select USB device
 - Parse input (use the device I have at hand)
+- Map device area to screen area (propotionally or directly)
 - Send input as emulated hid-device/directly using Windows apis
 - Windows Radial support (after all that's what this project initially targeted to accomplish)
 - Serial debugging tool
