@@ -1,23 +1,47 @@
-use hidapi::HidApi;
-fn list_devices() {
+pub(crate) fn list_devices() {
     println!("Printing all available hid devices:");
 
-    match HidApi::new() {
-        Ok(api) => {
-            for device in api.device_list() {
-                println!("{:04x}:{:04x}", device.vendor_id(), device.product_id());
-                if let Ok(open_device) = device.open_device(&api) {
-                    if let Ok(product_string) = open_device.get_product_string() {
-                        println!("product: {:?}", product_string);
-                    }
-                    if let Ok(manufacture_string) = open_device.get_manufacturer_string() {
-                        println!("manufacture: {:?}", manufacture_string);
-                    }
-                }
+    for device in rusb::devices()
+        .expect("Failed to get devices, chech permissions.")
+        .iter()
+    {
+        let device_desc = device
+            .device_descriptor()
+            .expect("Failed to get device descriptor.");
+        println!(
+            "{:04x}:{:04x}",
+            device_desc.vendor_id(),
+            device_desc.product_id()
+        );
+    }
+}
+
+use log::error;
+
+pub(crate) trait LogExpect<T> {
+    fn log_expect(self, msg: impl AsRef<str>) -> T;
+}
+
+impl<T, E: std::fmt::Debug> LogExpect<T> for Result<T, E> {
+    fn log_expect(self, message: impl AsRef<str>) -> T {
+        match self {
+            Ok(inner) => inner,
+            Err(error) => {
+                error!("{} - {:?}", message.as_ref(), error);
+                panic!("Exiting.");
             }
         }
-        Err(e) => {
-            eprintln!("Error: {}", e);
+    }
+}
+
+impl<T> LogExpect<T> for Option<T> {
+    fn log_expect(self, msg: impl AsRef<str>) -> T {
+        match self {
+            Some(inner) => inner,
+            None => {
+                error!("{}", msg.as_ref());
+                panic!("Exiting.");
+            }
         }
     }
 }
