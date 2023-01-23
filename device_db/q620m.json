@@ -1,0 +1,8 @@
+{
+  "id": "256c:006d",
+  "height": 33020,
+  "width": 53340,
+  "button_available": ["PenPrimary", "PenSecondary"],
+  "wheel": false,
+  "packet_length": 12
+}

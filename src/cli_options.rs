@@ -1,7 +1,7 @@
 // todo: log expect
 use std::path::PathBuf;
 
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use log::debug;
 
 use crate::utils::LogExpect;
@@ -9,13 +9,31 @@ use crate::utils::LogExpect;
 #[derive(Parser, Debug)]
 #[command(author, version)]
 pub(crate) struct CliOptions {
-    //// (optional) config file path
-    #[arg(short, long)]
+    #[command(subcommand)]
+    pub(crate) command: Command,
+
+    /// (optional) Config file path
+    #[arg(short, long, value_name = "path")]
     config: Option<PathBuf>,
 
-    #[arg(short, long)]
+    /// (optional) Device database path
+    #[arg(short, long, value_name = "path")]
     device_db: Option<PathBuf>,
 }
+
+#[derive(Subcommand, Debug)]
+pub(crate) enum Command {
+    /// Start in blocking mode
+    Run,
+
+    /// Start as daemon
+    Deamon,
+
+    /// Install relative udev rules
+    Install,
+}
+
+// todo: udev rules (linux only)
 
 impl CliOptions {
     pub(crate) fn get_config(&self) -> &PathBuf {

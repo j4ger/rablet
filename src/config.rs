@@ -2,7 +2,7 @@ use crate::utils::LogExpect;
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use std::{
-    fs::File,
+    fs::{self, File},
     io::{self, Read, Write},
     path::PathBuf,
 };
@@ -26,6 +26,8 @@ impl Config {
     }
 
     fn new_default(path: &PathBuf) -> Config {
+        fs::create_dir_all(path.parent().log_expect("Invalid config path."))
+            .log_expect("Failed to create config directory.");
         let config: Config = Default::default();
         config.save(path);
         info!("Generated new config: {:#?}", config);
