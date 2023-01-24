@@ -12,7 +12,6 @@ mod config;
 mod device_handler;
 mod device_info;
 mod device_pool;
-mod event_handler;
 mod interfaces;
 mod platform;
 mod tablet_device;

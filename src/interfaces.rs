@@ -4,11 +4,9 @@ use crate::{
     config::Config,
     device_info::{DeviceDB, DeviceInfo},
 };
-use log::info;
 use parking_lot::RwLock;
 use serde::Deserialize;
 use std::{collections::HashSet, fmt::Display, sync::Arc};
-use tokio::sync::mpsc::UnboundedSender;
 
 #[derive(Debug)]
 pub(crate) enum PartialUpdate {
@@ -101,27 +99,12 @@ pub(crate) struct DeviceStateInner {
 }
 
 impl DeviceStateInner {
-    pub(crate) fn update_button(
-        &mut self,
-        button: Button,
-        pressed: bool,
-        sender: &UnboundedSender<PartialUpdate>,
-    ) {
+    pub(crate) fn update_button(&mut self, button: Button, pressed: bool) {
         if self.button_state.contains(&button) ^ pressed {
             if pressed {
                 self.button_state.insert(button);
-                sender
-                    .send(PartialUpdate::Button(button, ButtonState::Press))
-                    .unwrap_or_else(|_| {
-                        info!("Failed to send partial update.");
-                    });
             } else {
                 self.button_state.remove(&button);
-                sender
-                    .send(PartialUpdate::Button(button, ButtonState::Release))
-                    .unwrap_or_else(|_| {
-                        info!("Failed to send partial update.");
-                    });
             }
         }
     }
